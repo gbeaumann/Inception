@@ -1,75 +1,51 @@
-version: "3.9"
+version: "3"
 
 services:
   nginx:
     container_name: nginx
+    build: ./requirements/nginx
+    volumes:
+      - wordpress:/var/www/wordpress
     depends_on:
       - wordpress
-    build:
-      context: ./requirements/nginx
-    image: img_nginx
-    volumes:
-      - wordpress-volume:/var/www/wordpress
-    networks:
-      - inception-network
     ports:
       - "443:443"
-    restart: unless-stopped
+    networks:
+      - wp
+    restart: on-failure
 
   mariadb:
     container_name: mariadb
-    build:
-      context: ./requirements/mariadb
-    expose:
-      - 3306
-    image: img_mariadb
+    build: ./requirements/mariadb
     volumes:
-      - mariadb-volume:/var/lib/mysql
+      - mariadb:/var/lib/mysql
+    expose:
+      - "3306"
     networks:
-      - inception-network
-    environment:
-      - MARIADB_ROOT_PWD=${MARIADB_ROOT_PWD}
-      - MARIADB_DB=${MARIADB_DB}
-      - MARIADB_USER=${MARIADB_USER}
-      - MARIADB_PWD=${MARIADB_PWD}
+      - wp
+    env_file:
+      - .env
     restart: unless-stopped
 
   wordpress:
     container_name: wordpress
+    build: ./requirements/wordpress
+    env_file: .env
     depends_on:
       - mariadb
-    build:
-      context: ./requirements/wordpress
-    expose:
-      - 9000
-    image: img_wordpress
     volumes:
-      - wordpress-volume:/var/www/wordpress
+      - wordpress:/var/www/wordpress
     networks:
-      - inception-network
-    environment: 
-      - WP_URL=${WP_URL}
-      - WP_DATABASE=${WP_DATABASE}
-      - WP_TITLE=${WP_TITLE}
-      - WP_ADMIN_USER=${WP_ADMIN_USER}
-      - WP_ADMIN_PWD=${WP_ADMIN_PWD}
-      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
-      - WP_USER=${WP_USER}
-      - WP_USER_PWD=${WP_USER_PWD}
-      - WP_USER_EMAIL=${WP_USER_EMAIL}
-      - MARIADB_HOST=${MARIADB_HOST}
-      - MARIADB_USER=${MARIADB_USER}
-      - MARIADB_PWD=${MARIADB_PWD}
-      - MARIADB_DB=${MARIADB_DB}
-    restart: unless-stopped
-  
+      - wp
+    expose:
+      - "9000"
+    restart: always
+
 volumes:
-  mariadb-volume:
+  wordpress:
     driver: local
-  
-  wordpress-volume:
+  mariadb:
     driver: local
 
-# docker network ls 
 networks:
-  inception-network:
+  wp:

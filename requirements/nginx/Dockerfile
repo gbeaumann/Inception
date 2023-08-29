@@ -1,20 +1,22 @@
 FROM debian:buster
 
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get -y install nginx openssl
+RUN apt update -y
+RUN apt install nginx vim zsh curl -y
 
-RUN mkdir ./etc/nginx/ssl
-RUN openssl req -x509 -new -newkey rsa:2048 -nodes \
-	-keyout /etc/nginx/ssl/gbeauman.key -days 365 \
-	-out /etc/nginx/ssl/gbeauman.crt \
-	-subj "/C=CH/ST=Lausanne/L=Lausanne/O=42 School/OU=gbeauman/CN=gbeauman/"
+RUN mkdir -p /etc/nginx/ssl
 
-COPY ./conf/nginx.conf /etc/nginx/nginx.conf
-#COPY ./index.html /var/www/html
+RUN apt install openssl -y
+
+RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=CH/ST=Lausanne/L=Lausanne/O=42 School/OU=gbeauman/CN=gbeauman/"
 
 RUN mkdir -p /var/run/nginx
 
-EXPOSE 443
+COPY conf/default.conf /etc/nginx/conf.d/
+COPY conf/nginx.conf /etc/nginx/nginx.conf
 
-ENTRYPOINT [ "nginx", "-g", "daemon off;" ]
+
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 755 /var/www/html
+
+CMD [ "nginx", "-g", "daemon off;" ]
+

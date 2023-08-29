@@ -1,25 +1,25 @@
-#!/bin/sh
+#!/bin/bash
 
-#check if wp-config.php exist
-if [ -f ./wp-config.php ]
-then
-	echo "wordpress already downloaded"
-else
+sleep 10
 
-	#Download wordpress and all config file
-	wget http://wordpress.org/latest.tar.gz
-	tar xfz latest.tar.gz
-	mv wordpress/* .
-	rm -rf latest.tar.gz
-	rm -rf wordpress
+mkdir -p /run/php
 
-	#Inport env variables in the config file
-	sed -i "s/username_here/$MARIADB_USER/g" wp-config-sample.php
-	sed -i "s/password_here/$MARIADB_PWD/g" wp-config-sample.php
-	sed -i "s/localhost/$WP_ADMIN_PWD/g" wp-config-sample.php
-	sed -i "s/database_name_here/$MARIADB_DB/g" wp-config-sample.php
-	cp wp-config-sample.php wp-config.php
+cd /var/www/wordpress/
 
-fi
+wp core install \
+    --path="/var/www/wordpress" \
+    --url=${WP_URL} \
+    --title=${WP_TITLE} \
+    --admin_user=${WP_ADMIN} \
+    --admin_email=${WP_EMAIL} \
+    --admin_password=${WP_ADMIN_PWD} \
+    --skip-email \
+    --allow-root
 
-php-fpm7.3 --nodaemonize
+wp user create --allow-root\
+    ${WP_DB_USER}\
+    ${WP_EMAIL_USER} \
+    --role=author\
+    --user_pass=${WP_DB_PWD}
+
+/usr/sbin/php-fpm7.3 --nodaemonize
