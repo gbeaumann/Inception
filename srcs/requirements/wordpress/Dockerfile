@@ -15,7 +15,8 @@ RUN mv wp-cli.phar /usr/local/bin/wp
 
 COPY conf/www.conf /etc/php/7.3/fpm/pool.d/
 
-COPY tool/entrypoint.sh /
-COPY conf/wp-config.php /var/www/wordpress/wp-config.php
+COPY tool/entrypoint.sh /entrypoint.sh
 
-CMD ["bash", "/entrypoint.sh"]
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]

@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 services:
   nginx:
@@ -11,18 +11,24 @@ services:
     ports:
       - "443:443"
     networks:
-      - wp
+      - inception
     restart: on-failure
 
   mariadb:
     container_name: mariadb
-    build: ./requirements/mariadb
+    build:
+      context: ./requirements/mariadb
+      args:
+        - DB_NAME=${DB_NAME}
+        - DB_PASSWORD=${DB_PASSWORD}
+        - DB_USER=${DB_USER}
+        - DB_ROOT_PWD=${DB_ROOT_PWD}
     volumes:
       - mariadb:/var/lib/mysql
+    networks:
+      - inception
     expose:
       - "3306"
-    networks:
-      - wp
     env_file:
       - .env
     restart: unless-stopped
@@ -36,16 +42,24 @@ services:
     volumes:
       - wordpress:/var/www/wordpress
     networks:
-      - wp
+      - inception
     expose:
       - "9000"
     restart: always
 
 volumes:
   wordpress:
-    driver: local
+    name: wordpress
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${HOME}/data/wordpress'
   mariadb:
-    driver: local
+    name: mariadb
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${HOME}/data/mariadb'
 
 networks:
-  wp:
+  inception:
