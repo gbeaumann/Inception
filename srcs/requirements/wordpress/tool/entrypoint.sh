@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sleep 10
-
 mkdir -p /run/php
 
 cd /var/www/wordpress
