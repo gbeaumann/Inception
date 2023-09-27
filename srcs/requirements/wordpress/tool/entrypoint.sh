@@ -19,7 +19,7 @@ wp core install \
 wp user create --allow-root \
     ${WP_USER_NAME} \
     ${WP_USER_EMAIL} \
-    --role=author \
+    --role=subscriber \
     --user_pass=${WP_USER_PWD}
 
 /usr/sbin/php-fpm7.3 --nodaemonize
