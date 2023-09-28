@@ -1,0 +1,19 @@
+
+# Mariadb
+DB_NAME=madb
+DB_USER=mysql
+DB_PASSWORD=1234
+DB_ROOT_PWD=1234
+DB_HOST=mariadb
+
+# Wordpress admin
+WP_URL=https://gbeauman.42.ch
+WP_TITLE=Welcome
+WP_ADMIN_NAME=gbeauman
+WP_ADMIN_PWD=1234
+WP_ADMIN_EMAIL=gbeauman@student.42lausanne.ch
+
+# Wordpress user
+WP_USER_NAME=eval
+WP_USER_PWD=1234
+WP_USER_EMAIL=eval@student.42lausanne.ch
